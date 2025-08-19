@@ -1,134 +1,169 @@
-# Backlot Prototype
+# Backlot App - Car Discovery & Management Platform
 
-A sleek, modern, Tinder-styled car marketplace mobile app built with Expo + React Native + TypeScript.
+A modern React Native mobile application built with Expo for discovering, saving, and managing cars. Features intuitive swipe gestures, a personal garage, and a clean, professional UI.
 
-## Features
+## 🚀 Features
 
-- **Frontend Only**: Pure UI mockup with no backend, APIs, or data persistence
-- **3-Tab Navigation**: Home, Garage, and Sell screens
-- **Modern Design**: Clean, card-based UI with proper spacing and typography
-- **Accessibility**: Proper labels and roles for interactive elements
-- **Responsive**: Optimized for both iOS and Android
+### Core Functionality
+- **Swipe Interface**: Intuitive left/right swipe gestures to save or remove cars
+- **Car Discovery**: Browse through curated car listings with detailed information
+- **Personal Garage**: Save and manage your favorite cars
+- **Modern UI**: Clean, responsive design with smooth animations
 
-## Screens
+### Technical Features
+- **React Native + Expo**: Cross-platform mobile development
+- **TypeScript**: Full type safety and better development experience
+- **Navigation**: Bottom tab navigation with React Navigation
+- **State Management**: Context API for car data management
+- **Gesture Handling**: React Native Gesture Handler for swipe interactions
+- **Responsive Design**: Adapts to different screen sizes and orientations
 
-### 🏠 Home
-- Tinder-style car card stack (static, no swipe logic)
-- "Find your next ride" header
-- Action buttons: Skip, Save, Details (non-functional)
-- Layered card design with rotation effects
+## 📱 Screens
 
-### 🚗 Garage
-- 2-column grid of "My Cars"
-- Status badges (For Sale, Sold, Pending)
-- Edit and Remove buttons (non-functional)
-- Car thumbnails with pricing
+### Home Screen
+- Car discovery interface with swipe functionality
+- Visual feedback during swipes (opacity, scale effects)
+- Swipe direction indicators (SAVE/REMOVE)
+- Action feedback overlays
+- Mock car data for demonstration
 
-### 📝 Sell
-- Non-functional form UI
-- Image picker placeholder
-- Text inputs for car details
-- Condition segmented control (New/Used)
-- Disabled "List Car" button with helper text
+### Garage Screen
+- Grid layout for saved cars
+- Responsive design (1-2 columns based on screen width)
+- Car status management
+- Search and filter capabilities (UI ready)
+- Empty state with call-to-action
 
-## Tech Stack
+### Sell Screen
+- Car listing form interface
+- Image upload placeholder
+- Form fields for car details
+- Condition selector (New/Used)
+- Demo form (frontend only)
 
-- **Expo SDK 50** (latest stable)
-- **React Native 0.73.6**
-- **TypeScript 5.1.3**
-- **React Navigation v6** with bottom tabs
-- **Expo Google Fonts**: Poppins (600/700) + Inter (400/500)
-- **Expo Vector Icons**: Ionicons
+## 🛠️ Tech Stack
 
-## Design System
+- **Frontend**: React Native 0.79.5, React 19.0.0
+- **Framework**: Expo SDK 53
+- **Navigation**: React Navigation 6
+- **Gestures**: React Native Gesture Handler
+- **Styling**: React Native StyleSheet
+- **Language**: TypeScript 5.9.2
+- **Icons**: Expo Vector Icons (Ionicons)
 
-- **Primary**: Navy Blue (#0B1D4D)
-- **Secondary**: Baby Blue (#CFE9FF)
-- **Background**: Light Blue (#F8FAFF)
-- **Text**: Dark (#0F172A)
-- **Muted**: Gray (#64748B)
-- **Typography**: Poppins for headings, Inter for body text
-- **Spacing**: Consistent 4px grid system
-- **Shadows**: Subtle, modern card shadows
+## 📦 Installation
 
-## Project Structure
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/avishettycodes/BacklotAppProposal.git
+   cd BacklotAppProposal
+   ```
 
-```
-BacklotPrototype/
-├── app/
-│   ├── App.tsx                 # Main app entry with font loading
-│   ├── navigation/
-│   │   └── BottomTabs.tsx     # Bottom tab navigation
-│   ├── screens/
-│   │   ├── HomeScreen.tsx      # Home screen with car stack
-│   │   ├── GarageScreen.tsx    # Garage grid layout
-│   │   └── SellScreen.tsx      # Sell form UI
-│   ├── components/
-│   │   ├── CarCard.tsx         # Reusable car card component
-│   │   └── Badge.tsx           # Status badge component
-│   └── theme/
-│       ├── colors.ts           # Color palette
-│       ├── typography.ts       # Font configurations
-│       └── spacing.ts          # Spacing constants
-├── assets/                     # App icons and splash screens
-├── package.json                # Dependencies
-├── tsconfig.json              # TypeScript config
-├── babel.config.js            # Babel config
-├── app.json                   # Expo config
-└── README.md                  # This file
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- Expo CLI (`npm install -g @expo/cli`)
-- Expo Go app on your mobile device
-
-### Installation
-
-1. **Clone and install dependencies:**
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. **Start the development server:**
+3. **Start the development server**
    ```bash
-   npx expo start
+   # For web
+   npx expo start --web
+   
+   # For iOS
+   npx expo start --ios
+   
+   # For Android
+   npx expo start --android
    ```
 
-3. **Run on device:**
-   - Scan the QR code with Expo Go (iOS/Android)
-   - Or press `i` for iOS simulator, `a` for Android emulator
+## 🔧 Development
 
-### Testing
+### Project Structure
+```
+app/
+├── components/          # Reusable UI components
+├── context/            # React Context for state management
+├── navigation/         # Navigation configuration
+├── screens/            # Main application screens
+└── App.tsx            # Root application component
+```
 
-- **iOS**: Tested on Expo Go for iOS
-- **Android**: Tested on Expo Go for Android
-- **Web**: Not optimized (mobile-only app)
+### Key Components
+- **CarCard**: Main car display component with swipe support
+- **GarageCard**: Car management card for the garage
+- **BottomTabs**: Navigation between main screens
+- **CarContext**: Global state management for saved cars
 
-## Development Notes
+### State Management
+The app uses React Context API for managing car data:
+- `savedCars`: Array of saved car objects
+- `addCar()`: Function to save a car
+- `removeCar()`: Function to remove a car
+- `isCarSaved()`: Check if a car is already saved
 
-- **No Backend**: All data is static/mock
-- **No State Management**: Only local component state for UI interactions
-- **No Persistence**: No data storage or form submission
-- **Navigation Only**: Tab switching is the only functional logic
-- **Accessibility**: Proper labels, roles, and hints for screen readers
+## 🎯 Usage
 
-## Customization
+### Swipe Gestures
+- **Swipe Right**: Save car to your garage
+- **Swipe Left**: Remove/reject car
+- **Threshold**: 100px swipe distance required
+- **Visual Feedback**: Opacity, scale, and color changes during swipes
 
-The app uses a centralized theme system:
-- Modify `theme/colors.ts` for color changes
-- Update `theme/typography.ts` for font adjustments
-- Adjust `theme/spacing.ts` for layout spacing
+### Navigation
+- **Home Tab**: Discover and swipe through cars
+- **Garage Tab**: View and manage saved cars
+- **Sell Tab**: List your own car (demo interface)
 
-## Troubleshooting
+## 🚧 Current Status
 
-- **Fonts not loading**: Ensure all font dependencies are installed
-- **Navigation issues**: Check React Navigation version compatibility
-- **Build errors**: Clear Metro cache with `npx expo start --clear`
+### ✅ Completed
+- Full swipe functionality with animations
+- Three main screens (Home, Garage, Sell)
+- Responsive design and layouts
+- TypeScript implementation
+- Navigation system
+- State management
+- Component architecture
 
-## License
+### 🔄 Demo Features
+- Mock car data for demonstration
+- Frontend-only form interface
+- Placeholder image uploads
+- Simulated car listings
 
-This is a prototype/demo project. No production use intended.
+### 🚀 Future Enhancements
+- Backend integration
+- Real car data API
+- User authentication
+- Image upload functionality
+- Push notifications
+- Advanced filtering and search
+
+## 🧪 Testing
+
+The application has been thoroughly tested for:
+- ✅ Component functionality
+- ✅ Navigation flow
+- ✅ Swipe gestures
+- ✅ State management
+- ✅ Responsive design
+- ✅ TypeScript compilation
+- ✅ Dependency management
+
+## 📱 Platform Support
+
+- **iOS**: Full support with native gestures
+- **Android**: Full support with native gestures
+- **Web**: Full support with mouse/touch events
+
+## 🤝 Contributing
+
+This is a prototype application. For contributions or questions, please contact the development team.
+
+## 📄 License
+
+This project is proprietary software. All rights reserved.
+
+---
+
+**Built with ❤️ using React Native and Expo**
