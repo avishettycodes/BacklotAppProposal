@@ -51,42 +51,7 @@ A modern React Native mobile application built with Expo for discovering, saving
 - **Language**: TypeScript 5.9.2
 - **Icons**: Expo Vector Icons (Ionicons)
 
-## 📦 Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/avishettycodes/BacklotAppProposal.git
-   cd BacklotAppProposal
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   # For web
-   npx expo start --web
-   
-   # For iOS
-   npx expo start --ios
-   
-   # For Android
-   npx expo start --android
-   ```
-
-## 🔧 Development
-
-### Project Structure
-```
-app/
-├── components/          # Reusable UI components
-├── context/            # React Context for state management
-├── navigation/         # Navigation configuration
-├── screens/            # Main application screens
-└── App.tsx            # Root application component
-```
 
 ### Key Components
 - **CarCard**: Main car display component with swipe support
