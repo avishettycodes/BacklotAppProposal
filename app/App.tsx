@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomTabs from './navigation/BottomTabs';
 import { CarProvider } from './context/CarContext';
 
@@ -16,14 +17,16 @@ export default function App() {
   // Temporarily removed font loading to test SafeAreaView fix
   
   return (
-    <SafeAreaProvider>
-      <CarProvider>
-        <NavigationContainer>
-          <StatusBar style="dark" backgroundColor={colors.background} />
-          <BottomTabs />
-        </NavigationContainer>
-      </CarProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <CarProvider>
+          <NavigationContainer>
+            <StatusBar style="dark" backgroundColor={colors.background} />
+            <BottomTabs />
+          </NavigationContainer>
+        </CarProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
