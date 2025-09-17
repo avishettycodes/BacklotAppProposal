@@ -9,8 +9,10 @@ import SellScreen from '../screens/SellScreen';
 const Tab = createBottomTabNavigator();
 
 const colors = { 
-  primary: '#0B1D4D', 
-  muted: '#64748B' 
+  primary: '#3B82F6', 
+  muted: '#64748B',
+  background: '#FFFFFF',
+  border: '#E2E8F0'
 };
 
 export default function BottomTabs() {
@@ -25,13 +27,26 @@ export default function BottomTabs() {
         tabBarInactiveTintColor: colors.muted,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: 56 + bottomInset,
-          paddingBottom: Math.max(bottomInset, 8),
-          paddingTop: 6,
-          borderTopWidth: 0,
-          backgroundColor: '#FFFFFF',
+          height: 60 + bottomInset,
+          paddingBottom: Math.max(bottomInset, 12),
+          paddingTop: 8,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+          backgroundColor: colors.background,
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: -2,
+          },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 8,
         },
-        tabBarLabelStyle: { fontSize: 12 },
+        tabBarLabelStyle: { 
+          fontSize: 12, 
+          fontWeight: '600',
+          marginTop: 2,
+        },
       }}
     >
       <Tab.Screen 

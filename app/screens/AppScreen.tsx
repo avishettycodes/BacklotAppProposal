@@ -13,7 +13,7 @@ export default function AppScreen({ children }: Props) {
     <View
       style={{
         flex: 1,
-        backgroundColor: '#F8FAFF',
+        backgroundColor: '#F8FAFC',
         paddingTop: insets.top,
         paddingLeft: insets.left,
         paddingRight: insets.right,
