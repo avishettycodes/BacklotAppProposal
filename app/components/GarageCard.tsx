@@ -4,12 +4,16 @@ import { Ionicons } from '@expo/vector-icons';
 
 interface GarageCardProps {
   width: number;
+  imgWidth: number;
   imgHeight: number;
-  title: string;
+  year: string;
+  make: string;
+  model: string;
+  trim: string;
   price: string;
   status: string;
-  details: string;
   imageUri: string;
+  onPress: () => void;
   onMessage: () => void;
   onRemove: () => void;
   onOverflow: () => void;
@@ -17,181 +21,139 @@ interface GarageCardProps {
 
 export default function GarageCard({
   width,
+  imgWidth,
   imgHeight,
-  title,
+  year,
+  make,
+  model,
+  trim,
   price,
   status,
-  details,
   imageUri,
+  onPress,
   onMessage,
   onRemove,
   onOverflow,
 }: GarageCardProps) {
-  const getStatusStyle = () => {
-    switch (status) {
-      case 'Saved':
-        return { backgroundColor: '#CFE9FF', color: '#0B1D4D' };
-      case 'For Sale':
-        return { backgroundColor: '#CFE9FF', color: '#0B1D4D' };
-      case 'Sold':
-        return { backgroundColor: '#16A34A', color: '#FFFFFF' };
-      case 'Pending':
-        return { backgroundColor: '#F59E0B', color: '#FFFFFF' };
-      default:
-        return { backgroundColor: '#CFE9FF', color: '#0B1D4D' };
-    }
-  };
-
-  const statusStyle = getStatusStyle();
-
+  const title = `${year} ${make} ${model} ${trim}`;
+  
   return (
-    <View style={[styles.card, { width, height: imgHeight + 200 }]}>
-      {/* Image with Status Pill */}
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: imageUri }} style={[styles.image, { height: imgHeight }]} />
-        <View style={[styles.statusPill, { backgroundColor: statusStyle.backgroundColor }]}>
-          <Text style={[styles.statusText, { color: statusStyle.color }]}>{status}</Text>
-        </View>
-        
-        {/* Overflow Menu */}
-        <Pressable 
-          style={styles.overflowButton}
-          onPress={onOverflow}
-          accessibilityLabel={`More options for ${title}`}
-        >
-          <Ionicons name="ellipsis-vertical" size={20} color="#64748B" />
-        </Pressable>
-      </View>
+    <Pressable 
+      style={[styles.card, { width }]}
+      onPress={onPress}
+      accessibilityLabel={`View details for ${title}`}
+    >
+      {/* Image */}
+      <Image source={{ uri: imageUri }} style={[styles.image, { width: imgWidth, height: imgHeight }]} />
 
       {/* Card Body */}
       <View style={styles.body}>
-        <Text style={styles.title} numberOfLines={2}>
-          {title}
+        <Text style={styles.title} numberOfLines={1}>
+          {year} {make} {model}
         </Text>
+        <Text style={styles.trim} numberOfLines={1}>{trim}</Text>
         <Text style={styles.price}>{price}</Text>
-        <Text style={styles.meta}>{details}</Text>
-        
-        {/* Actions Row */}
-        <View style={styles.actionsRow}>
-          <Pressable 
-            style={styles.primaryBtn}
-            onPress={onMessage}
-            accessibilityLabel={`Message seller for ${title}`}
-          >
-            <Ionicons name="chatbubble-ellipses-outline" size={16} color="#FFFFFF" />
-            <Text style={styles.primaryBtnText}>Message</Text>
-          </Pressable>
-          
-          <Pressable 
-            style={styles.dangerBtn}
-            onPress={onRemove}
-            accessibilityLabel={`Remove ${title} from Garage`}
-          >
-            <Ionicons name="trash-outline" size={16} color="#B91C1C" />
-            <Text style={styles.dangerBtnText}>Remove</Text>
-          </Pressable>
-        </View>
       </View>
-    </View>
+
+      {/* Action Buttons */}
+      <View style={styles.actionButtons}>
+        <Pressable 
+          style={styles.removeButton}
+          onPress={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          accessibilityLabel={`Remove ${title} from Garage`}
+        >
+          <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
+        </Pressable>
+        
+        <Pressable 
+          style={styles.messageButton}
+          onPress={(e) => {
+            e.stopPropagation();
+            onMessage();
+          }}
+          accessibilityLabel={`Message seller for ${title}`}
+        >
+          <Ionicons name="chatbubble-ellipses-outline" size={20} color="#FFFFFF" />
+        </Pressable>
+      </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    shadowColor: '#0B1D4D',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 5,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+    flexDirection: 'row',
     overflow: 'hidden',
-  },
-  imageContainer: {
-    position: 'relative',
+    height: 120,
   },
   image: {
-    width: '100%',
     resizeMode: 'cover',
   },
-  statusPill: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  overflowButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   body: {
+    flex: 1,
     padding: 16,
+    justifyContent: 'center',
   },
   title: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#0F172A',
+    lineHeight: 20,
+    marginBottom: 2,
+  },
+  trim: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#64748B',
     marginBottom: 8,
-    lineHeight: 22,
   },
   price: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#0B1D4D',
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#3B82F6',
   },
-  meta: {
-    fontSize: 14,
-    color: '#64748B',
-    marginBottom: 16,
-  },
-  actionsRow: {
-    flexDirection: 'row',
+  actionButtons: {
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 12,
+    paddingHorizontal: 16,
   },
-  primaryBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+  removeButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#EF4444',
     justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#0B1D4D',
-    paddingVertical: 12,
-    borderRadius: 14,
-    minHeight: 44,
-  },
-  primaryBtnText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  dangerBtn: {
-    flex: 1,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#FEE2E2',
-    paddingVertical: 12,
-    borderRadius: 14,
-    minHeight: 44,
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  dangerBtnText: {
-    color: '#B91C1C',
-    fontSize: 14,
-    fontWeight: '500',
+  messageButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#3B82F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });

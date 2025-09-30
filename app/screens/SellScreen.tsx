@@ -10,66 +10,88 @@ export default function SellScreen() {
   return (
     <AppScreen>
       <View style={styles.container}>
-        {/* Top Bar */}
-        <View style={styles.topBar}>
-          <Text style={styles.title}>List Your Car</Text>
-          <View style={styles.separatorLine} />
-        </View>
-
         {/* Content Area */}
         <ScrollView
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: 24 + bottomInset }
+            { paddingBottom: 24 + bottomInset, paddingTop: 24 }
           ]}
           showsVerticalScrollIndicator={false}
         >
+          {/* Welcoming Header */}
+          <View style={styles.welcomeHeader}>
+            <Text style={styles.welcomeTitle}>Sell Your Car</Text>
+            <Text style={styles.welcomeSubtitle}>Fill in a few details and you're done!</Text>
+          </View>
+
           {/* Form */}
           <View style={styles.form}>
-            <View style={styles.imagePickerContainer}>
-              <View style={styles.imagePicker}>
-                <Text style={styles.imagePickerText}>📷</Text>
-                <Text style={styles.imagePickerLabel}>Add Photos</Text>
-                <Text style={styles.imagePickerSubtext}>Tap to upload images</Text>
+            {/* Photos */}
+            <View style={styles.card}>
+              <View style={styles.imagePickerContainer}>
+                <View style={styles.imagePicker}>
+                  <Text style={styles.imagePickerText}>📷</Text>
+                  <Text style={styles.imagePickerLabel}>Add Photos</Text>
+                </View>
               </View>
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Make</Text>
-              <Text style={styles.textInput}>e.g., Tesla</Text>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Model</Text>
-              <Text style={styles.textInput}>e.g., Model 3</Text>
-            </View>
-
-            <View style={styles.inputRow}>
-              <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Year</Text>
-                <Text style={styles.textInput}>2020</Text>
+            {/* Car Info */}
+            <View style={styles.card}>
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Year</Text>
+                  <Text style={styles.textInput}>2020</Text>
+                </View>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Make</Text>
+                  <Text style={styles.textInput}>Tesla</Text>
+                </View>
               </View>
 
-              <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Price</Text>
-                <Text style={styles.textInput}>$34,990</Text>
-              </View>
-            </View>
-
-            <View style={styles.inputRow}>
-              <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Mileage</Text>
-                <Text style={styles.textInput}>12,400 mi</Text>
-              </View>
-
-              <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Location</Text>
-                <Text style={styles.textInput}>San Jose, CA</Text>
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Model</Text>
+                  <Text style={styles.textInput}>Model 3</Text>
+                </View>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Trim</Text>
+                  <Text style={styles.textInput}>Long Range</Text>
+                </View>
               </View>
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Condition</Text>
+            {/* Price & Mileage */}
+            <View style={styles.card}>
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Price</Text>
+                  <Text style={styles.textInput}>$34,990</Text>
+                </View>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Miles</Text>
+                  <Text style={styles.textInput}>12,400</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Location */}
+            <View style={styles.card}>
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>City</Text>
+                  <Text style={styles.textInput}>San Jose</Text>
+                </View>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>State</Text>
+                  <Text style={styles.textInput}>CA</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Condition */}
+            <View style={styles.card}>
+              <Text style={styles.cardLabel}>Condition</Text>
               <View style={styles.segmentedControl}>
                 <Pressable
                   style={[
@@ -77,9 +99,6 @@ export default function SellScreen() {
                     condition === 'New' && styles.segmentActive,
                   ]}
                   onPress={() => setCondition('New')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="New condition option"
                 >
                   <Text
                     style={[
@@ -96,9 +115,6 @@ export default function SellScreen() {
                     condition === 'Used' && styles.segmentActive,
                   ]}
                   onPress={() => setCondition('Used')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Used condition option"
                 >
                   <Text
                     style={[
@@ -112,12 +128,73 @@ export default function SellScreen() {
               </View>
             </View>
 
+            {/* Details */}
+            <View style={styles.card}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Title Status</Text>
+                <Text style={styles.textInput}>Clean Title</Text>
+              </View>
+
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Transmission</Text>
+                  <Text style={styles.textInput}>Automatic</Text>
+                </View>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Fuel</Text>
+                  <Text style={styles.textInput}>Electric</Text>
+                </View>
+              </View>
+
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Exterior</Text>
+                  <Text style={styles.textInput}>Pearl White</Text>
+                </View>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Interior</Text>
+                  <Text style={styles.textInput}>Black</Text>
+                </View>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Seats</Text>
+                <Text style={styles.textInput}>5</Text>
+              </View>
+            </View>
+
+            {/* Description */}
+            <View style={styles.card}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.cardLabel}>About Your Car</Text>
+                <Text style={[styles.textInput, styles.textArea]}>
+                  Tell buyers what makes your car special...
+                </Text>
+              </View>
+            </View>
+
+            {/* Good & Bad */}
+            <View style={styles.card}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Pros</Text>
+                <Text style={[styles.textInput, styles.textArea]}>
+                  Low mileage{'\n'}Clean title{'\n'}Great condition
+                </Text>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Cons</Text>
+                <Text style={[styles.textInput, styles.textArea]}>
+                  Minor door ding{'\n'}Tires need replacing soon
+                </Text>
+              </View>
+            </View>
+
             <Pressable
               style={[styles.submitButton, styles.submitButtonDisabled]}
               accessible={true}
               accessibilityRole="button"
               accessibilityLabel="List car button, disabled"
-              accessibilityHint="This button is disabled as this is a frontend only demo"
             >
               <Text style={styles.submitButtonText}>List Car</Text>
             </Pressable>
@@ -135,141 +212,159 @@ export default function SellScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB', // Added background color for the container
-  },
-  topBar: {
-    paddingTop: 16,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#0F172A',
-    textAlign: 'center',
-  },
-  separatorLine: {
-    height: 1,
-    backgroundColor: '#E5E7EB',
-    marginTop: 8,
-    width: '100%',
+    backgroundColor: '#F8FAFC',
   },
   scrollContent: {
-    paddingTop: 16,
     paddingHorizontal: 20,
   },
+  welcomeHeader: {
+    marginBottom: 32,
+    alignItems: 'center',
+  },
+  welcomeTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
+  welcomeSubtitle: {
+    fontSize: 16,
+    color: '#64748B',
+    textAlign: 'center',
+    fontWeight: '500',
+    lineHeight: 24,
+  },
   form: {
-    gap: 24,
+    gap: 16,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    gap: 16,
+  },
+  cardLabel: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginBottom: 8,
   },
   imagePickerContainer: {
     alignItems: 'center',
   },
   imagePicker: {
     width: '100%',
-    height: 200,
-    backgroundColor: '#FFFFFF',
+    height: 150,
+    backgroundColor: '#F8FAFC',
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: '#E2E8F0',
+    borderColor: '#3B82F6',
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: 'rgba(11, 29, 77, 0.1)',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   imagePickerText: {
     fontSize: 48,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   imagePickerLabel: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0B1D4D',
-    marginBottom: 4,
-  },
-  imagePickerSubtext: {
-    fontSize: 14,
-    color: '#64748B',
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#3B82F6',
   },
   inputGroup: {
-    gap: 8,
+    gap: 10,
   },
   inputRow: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
   },
   halfWidth: {
     flex: 1,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#0F172A',
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#475569',
+    marginBottom: 8,
   },
   textInput: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    backgroundColor: '#F8FAFC',
+    borderWidth: 0,
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     fontSize: 16,
-    color: '#64748B',
+    color: '#CBD5E1',
+  },
+  textArea: {
+    minHeight: 100,
+    paddingTop: 14,
+    textAlignVertical: 'top',
   },
   segmentedControl: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8FAFC',
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    overflow: 'hidden',
+    padding: 4,
+    gap: 8,
   },
   segment: {
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
+    borderRadius: 8,
   },
   segmentActive: {
-    backgroundColor: '#0B1D4D',
+    backgroundColor: '#3B82F6',
   },
   segmentText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#64748B',
+    fontWeight: '600',
+    color: '#94A3B8',
   },
   segmentTextActive: {
     color: '#FFFFFF',
   },
   submitButton: {
-    backgroundColor: '#0B1D4D',
-    paddingVertical: 16,
+    backgroundColor: '#3B82F6',
+    paddingVertical: 18,
     paddingHorizontal: 24,
     borderRadius: 16,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 8,
+    shadowColor: '#3B82F6',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   submitButtonDisabled: {
-    backgroundColor: '#64748B',
-    opacity: 0.6,
+    backgroundColor: '#94A3B8',
+    opacity: 0.7,
   },
   submitButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 18,
+    fontWeight: '700',
     color: '#FFFFFF',
   },
   helperText: {
-    fontSize: 14,
+    fontSize: 13,
     textAlign: 'center',
-    color: '#64748B',
-    marginTop: 16,
+    color: '#94A3B8',
+    marginTop: 12,
   },
 });

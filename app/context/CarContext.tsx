@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 export interface Car {
   id: string;
   imageUri: string;
+  images?: string[];
   year: string;
   make: string;
   model: string;
@@ -14,9 +15,19 @@ export interface Car {
   titleStatus: string;
   condition: string;
   seller: string;
-  // Legacy fields for backward compatibility
-  title?: string;
-  details?: string;
+  dealTier?: string;
+  listedDate?: string;
+  transmission?: string;
+  fuelType?: string;
+  exteriorColor?: string;
+  interiorColor?: string;
+  seats?: number;
+  description?: string;
+  pros?: string[];
+  cons?: string[];
+  // Legacy fields for backward compatibility - provide defaults
+  title: string;
+  details: string;
 }
 
 interface CarContextType {

@@ -23,8 +23,8 @@
         "backgroundColor": "#0B1D4D"
       }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

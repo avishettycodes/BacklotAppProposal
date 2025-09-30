@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Platform, Image, Animated, Dimensions, Pressable, Easing, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Platform, Image, Animated, Dimensions, Pressable, Easing, ScrollView, Modal, TouchableOpacity } from 'react-native';
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import AppScreen from './AppScreen';
 import { useCarContext } from '../context/CarContext';
@@ -287,6 +287,10 @@ export default function HomeScreen() {
   const [swipeText, setSwipeText] = useState('');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
+  const [carouselIndices, setCarouselIndices] = useState<Record<number, number>>({});
+  const [isFullScreenImage, setIsFullScreenImage] = useState(false);
+  const [fullScreenImages, setFullScreenImages] = useState<string[]>([]);
+  const [fullScreenStartIndex, setFullScreenStartIndex] = useState(0);
   const { addCar, isCarSaved } = useCarContext();
   
   // Card stack animations - each card has its own animated values
@@ -424,6 +428,18 @@ export default function HomeScreen() {
     }
   };
 
+  const handleCarouselScroll = (event: any, cardIndex: number) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x;
+    const imageIndex = Math.round(contentOffsetX / (screenWidth - 40));
+    setCarouselIndices(prev => ({ ...prev, [cardIndex]: imageIndex }));
+  };
+
+  const openFullScreenImage = (images: string[], startIndex: number) => {
+    setFullScreenImages(images);
+    setFullScreenStartIndex(startIndex);
+    setIsFullScreenImage(true);
+  };
+
   const handleCardFlip = (cardIndex: number) => {
     console.log('Card flip attempt:', { 
       cardIndex, 
@@ -489,6 +505,7 @@ export default function HomeScreen() {
             addCar({
               id: currentCar.id,
               imageUri: currentCar.imageUri,
+              images: currentCar.images,
               year: currentCar.year,
               make: currentCar.make,
               model: currentCar.model,
@@ -500,9 +517,19 @@ export default function HomeScreen() {
               titleStatus: currentCar.titleStatus,
               condition: currentCar.condition,
               seller: currentCar.seller,
-              // Legacy fields for backward compatibility
-              title: currentCar.title,
-              details: currentCar.details
+              dealTier: currentCar.dealTier,
+              listedDate: currentCar.listedDate,
+              transmission: currentCar.transmission,
+              fuelType: currentCar.fuelType,
+              exteriorColor: currentCar.exteriorColor,
+              interiorColor: currentCar.interiorColor,
+              seats: currentCar.seats,
+              description: currentCar.description,
+              pros: currentCar.pros,
+              cons: currentCar.cons,
+              // Legacy fields for backward compatibility - provide defaults if not available
+              title: currentCar.title || `${currentCar.year} ${currentCar.make} ${currentCar.model}`,
+              details: currentCar.details || `${currentCar.year} • ${currentCar.miles} mi • ${currentCar.city}, ${currentCar.state}`
             });
           }
         }
@@ -628,34 +655,21 @@ export default function HomeScreen() {
 
     return (
       <Animated.View key={item.id} style={[styles.cardContainer, cardStyle]}>
-        <Pressable 
-          style={styles.carCard}
-          onPress={() => handleCardFlip(index)}
-        >
+        <View style={styles.carCard}>
           {!isFlipped ? (
             /* Front of card */
             <View style={styles.cardFront}>
               <View style={styles.imageContainer}>
                 <Image source={{ uri: item.imageUri }} style={styles.carImage} />
                 <View style={styles.imageOverlay} />
-                <View style={styles.priceBadge}>
+                <View style={[styles.priceBadge, { backgroundColor: getDealTierColor(item.dealTier) }]}>
                   <Text style={styles.priceBadgeText}>{item.price}</Text>
                 </View>
               </View>
               
               <View style={styles.cardDetails}>
                 <View style={styles.titleRow}>
-                  <View style={styles.titleLeft}>
-                    <Text style={styles.carTitle}>{item.year} {item.make} {item.model} {item.trim}</Text>
-                  </View>
-                  <View style={styles.priceRight}>
-                    <Text style={[
-                      styles.priceText, 
-                      { color: isGoodPrice(item.price, item.year, item.make) ? '#059669' : '#DC2626' }
-                    ]}>
-                      {item.price}
-                    </Text>
-                  </View>
+                  <Text style={styles.carTitle}>{item.year} {item.make} {item.model} {item.trim}</Text>
                 </View>
                 
                 <View style={styles.milesLocationRow}>
@@ -676,42 +690,6 @@ export default function HomeScreen() {
                 contentContainerStyle={styles.scrollContent}
                 nestedScrollEnabled={true}
               >
-                {/* Simple test content first */}
-                <View style={styles.testBackContent}>
-                  <Text style={styles.testBackTitle}>CARD BACK TEST</Text>
-                  <Text style={styles.testBackSubtitle}>This should be visible when flipped</Text>
-                  <Text style={styles.testBackInfo}>Car: {item.year} {item.make} {item.model}</Text>
-                  <Text style={styles.testBackInfo}>Price: {item.price}</Text>
-                  <Text style={styles.testBackInfo}>Flipped: {isFlipped ? 'YES' : 'NO'}</Text>
-                </View>
-
-                {/* Additional test content for scrolling */}
-                <View style={styles.scrollTestContent}>
-                  <Text style={styles.scrollTestTitle}>SCROLL TEST</Text>
-                  <Text style={styles.scrollTestText}>This content should be scrollable</Text>
-                  <Text style={styles.scrollTestText}>Line 1</Text>
-                  <Text style={styles.scrollTestText}>Line 2</Text>
-                  <Text style={styles.scrollTestText}>Line 3</Text>
-                  <Text style={styles.scrollTestText}>Line 4</Text>
-                  <Text style={styles.scrollTestText}>Line 5</Text>
-                  <Text style={styles.scrollTestText}>Line 6</Text>
-                  <Text style={styles.scrollTestText}>Line 7</Text>
-                  <Text style={styles.scrollTestText}>Line 8</Text>
-                  <Text style={styles.scrollTestText}>Line 9</Text>
-                  <Text style={styles.scrollTestText}>Line 10</Text>
-                  <Text style={styles.scrollTestText}>Line 11</Text>
-                  <Text style={styles.scrollTestText}>Line 12</Text>
-                  <Text style={styles.scrollTestText}>Line 13</Text>
-                  <Text style={styles.scrollTestText}>Line 14</Text>
-                  <Text style={styles.scrollTestText}>Line 15</Text>
-                  <Text style={styles.scrollTestText}>Line 16</Text>
-                  <Text style={styles.scrollTestText}>Line 17</Text>
-                  <Text style={styles.scrollTestText}>Line 18</Text>
-                  <Text style={styles.scrollTestText}>Line 19</Text>
-                  <Text style={styles.scrollTestText}>Line 20</Text>
-                  <Text style={styles.scrollTestText}>END OF SCROLL TEST</Text>
-                </View>
-
                 {/* Image Carousel */}
                 <View style={styles.imageCarousel}>
                   <ScrollView 
@@ -719,123 +697,101 @@ export default function HomeScreen() {
                     showsHorizontalScrollIndicator={false}
                     pagingEnabled
                     style={styles.carouselScroll}
+                    onMomentumScrollEnd={(event) => handleCarouselScroll(event, index)}
                   >
                     {item.images?.map((imageUri, imgIndex) => (
-                      <Image 
+                      <TouchableOpacity 
                         key={imgIndex}
-                        source={{ uri: imageUri }} 
-                        style={styles.carouselImage} 
-                      />
+                        activeOpacity={0.9}
+                        onPress={() => openFullScreenImage(item.images || [], imgIndex)}
+                      >
+                        <Image 
+                          source={{ uri: imageUri }} 
+                          style={styles.carouselImage} 
+                        />
+                      </TouchableOpacity>
                     ))}
                   </ScrollView>
                   <View style={styles.imageCounter}>
                     <Text style={styles.imageCounterText}>
-                      {item.images?.findIndex(img => img === item.imageUri) + 1 || 1} / {item.images?.length || 1}
+                      {(carouselIndices[index] ?? 0) + 1} / {item.images?.length || 1}
                     </Text>
                   </View>
                 </View>
 
-                {/* Vehicle Details Header */}
-                <View style={styles.backHeader}>
-                  <Text style={styles.backVehicleTitle}>{item.year} {item.make} {item.model} {item.trim}</Text>
-                  <Text style={styles.backPrice}>{item.price}</Text>
-                  <View style={styles.backMileageRow}>
-                    <Text style={styles.backMileage}>{item.miles} mi</Text>
-                    <View style={[styles.dealTierBadge, { backgroundColor: getDealTierColor(item.dealTier) + '20' }]}>
-                      <Text style={[styles.dealTierText, { color: getDealTierColor(item.dealTier) }]}>
-                        {item.dealTier}
-                      </Text>
-                    </View>
-                  </View>
-                  <Text style={styles.listedTime}>{getTimeSinceListing(item.listedDate)}</Text>
-                </View>
-
-                {/* Seller Info */}
-                <View style={styles.sellerSection}>
-                  <Text style={styles.sectionTitle}>Seller Information</Text>
-                  <View style={styles.sellerInfo}>
-                    <Text style={styles.sellerName}>{item.seller}</Text>
-                    <Text style={styles.sellerLocation}>{item.city}, {item.state}</Text>
-                  </View>
-                </View>
-
-                {/* Vehicle Specs */}
-                <View style={styles.specsSection}>
-                  <Text style={styles.sectionTitle}>Vehicle Specifications</Text>
-                  <View style={styles.specsGrid}>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Year</Text>
-                      <Text style={styles.specValue}>{item.year}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Make</Text>
-                      <Text style={styles.specValue}>{item.make}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Model</Text>
-                      <Text style={styles.specValue}>{item.model}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Trim</Text>
-                      <Text style={styles.specValue}>{item.trim}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Title Status</Text>
-                      <Text style={styles.specValue}>{item.titleStatus}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Transmission</Text>
-                      <Text style={styles.specValue}>{item.transmission}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Fuel Type</Text>
-                      <Text style={styles.specValue}>{item.fuelType}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Listed Date</Text>
-                      <Text style={styles.specValue}>{new Date(item.listedDate).toLocaleDateString()}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Exterior Color</Text>
-                      <Text style={styles.specValue}>{item.exteriorColor}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Interior Color</Text>
-                      <Text style={styles.specValue}>{item.interiorColor}</Text>
-                    </View>
-                    <View style={styles.specRow}>
-                      <Text style={styles.specLabel}>Seats</Text>
-                      <Text style={styles.specValue}>{item.seats}</Text>
-                    </View>
-                  </View>
-                </View>
-
-                {/* Description */}
-                <View style={styles.descriptionSection}>
-                  <Text style={styles.sectionTitle}>Description</Text>
-                  <Text style={styles.descriptionText}>{item.description}</Text>
-                </View>
-
-                {/* Pros and Cons */}
-                <View style={styles.prosConsSection}>
-                  <View style={styles.prosSection}>
-                    <Text style={styles.prosConsTitle}>Pros</Text>
-                    {item.pros?.map((pro, index) => (
-                      <View key={index} style={styles.prosConsItem}>
-                        <Text style={styles.prosConsBullet}>•</Text>
-                        <Text style={styles.prosText}>{pro}</Text>
+                {/* Compact Header with Price and Deal Badge */}
+                <View style={styles.backHeaderCompact}>
+                  <View style={styles.backHeaderTop}>
+                    <View style={styles.backHeaderLeft}>
+                      <Text style={styles.backPrice}>{item.price}</Text>
+                      <View style={[styles.dealTierBadgeCompact, { backgroundColor: getDealTierColor(item.dealTier) }]}>
+                        <Text style={styles.dealTierTextCompact}>{item.dealTier}</Text>
                       </View>
+                    </View>
+                  </View>
+                  <Text style={styles.backVehicleTitleCompact}>{item.year} {item.make} {item.model} {item.trim}</Text>
+                  <View style={styles.quickInfoRow}>
+                    <Text style={styles.quickInfoText}>{item.miles} mi</Text>
+                    <Text style={styles.quickInfoDivider}>•</Text>
+                    <Text style={styles.quickInfoText}>{item.city}, {item.state}</Text>
+                    <Text style={styles.quickInfoDivider}>•</Text>
+                    <Text style={styles.quickInfoText}>{getTimeSinceListing(item.listedDate)}</Text>
+                  </View>
+                </View>
+
+                {/* Key Details Grid - Most Important Info */}
+                <View style={styles.keyDetailsSection}>
+                  <View style={styles.keyDetailItem}>
+                    <Text style={styles.keyDetailLabel}>Mileage</Text>
+                    <Text style={styles.keyDetailValue}>{item.miles} mi</Text>
+                  </View>
+                  <View style={styles.keyDetailItem}>
+                    <Text style={styles.keyDetailLabel}>Title</Text>
+                    <Text style={styles.keyDetailValue}>{item.titleStatus}</Text>
+                  </View>
+                  <View style={styles.keyDetailItem}>
+                    <Text style={styles.keyDetailLabel}>Transmission</Text>
+                    <Text style={styles.keyDetailValue}>{item.transmission}</Text>
+                  </View>
+                  <View style={styles.keyDetailItem}>
+                    <Text style={styles.keyDetailLabel}>Fuel Type</Text>
+                    <Text style={styles.keyDetailValue}>{item.fuelType}</Text>
+                  </View>
+                  <View style={styles.keyDetailItem}>
+                    <Text style={styles.keyDetailLabel}>Exterior</Text>
+                    <Text style={styles.keyDetailValue}>{item.exteriorColor}</Text>
+                  </View>
+                  <View style={styles.keyDetailItem}>
+                    <Text style={styles.keyDetailLabel}>Interior</Text>
+                    <Text style={styles.keyDetailValue}>{item.interiorColor}</Text>
+                  </View>
+                </View>
+
+                {/* Pros and Cons Side by Side */}
+                <View style={styles.prosConsCompact}>
+                  <View style={styles.prosColumnCompact}>
+                    <Text style={styles.prosConsTitleCompact}>Pros</Text>
+                    {item.pros?.slice(0, 3).map((pro, idx) => (
+                      <Text key={idx} style={styles.prosTextCompact}>• {pro}</Text>
                     ))}
                   </View>
-                  <View style={styles.consSection}>
-                    <Text style={styles.prosConsTitle}>Cons</Text>
-                    {item.cons?.map((con, index) => (
-                      <View key={index} style={styles.prosConsItem}>
-                        <Text style={styles.prosConsBullet}>•</Text>
-                        <Text style={styles.consText}>{con}</Text>
-                      </View>
+                  <View style={styles.consColumnCompact}>
+                    <Text style={styles.prosConsTitleCompact}>Cons</Text>
+                    {item.cons?.slice(0, 3).map((con, idx) => (
+                      <Text key={idx} style={styles.consTextCompact}>• {con}</Text>
                     ))}
                   </View>
+                </View>
+
+                {/* Description - Condensed */}
+                <View style={styles.descriptionCompact}>
+                  <Text style={styles.descriptionTextCompact}>{item.description}</Text>
+                </View>
+
+                {/* Seller Info - Compact */}
+                <View style={styles.sellerCompact}>
+                  <Text style={styles.sellerLabel}>Seller</Text>
+                  <Text style={styles.sellerNameCompact}>{item.seller}</Text>
                 </View>
               </ScrollView>
             </View>
@@ -860,7 +816,7 @@ export default function HomeScreen() {
             </View>
           )}
           
-        </Pressable>
+        </View>
       </Animated.View>
     );
   };
@@ -882,13 +838,6 @@ export default function HomeScreen() {
   return (
     <AppScreen>
       <View style={styles.container}>
-        {/* Debug info */}
-        <View style={styles.debugInfo}>
-          <Text style={styles.debugText}>
-            Card {currentIndex + 1} of {sampleCars.length}: {sampleCars[currentIndex]?.title}
-          </Text>
-        </View>
-        
         <PanGestureHandler
           key={currentIndex}
           onGestureEvent={onGestureEvent}
@@ -897,6 +846,7 @@ export default function HomeScreen() {
           failOffsetY={[-10, 10]}
           minPointers={1}
           maxPointers={1}
+          enabled={!flippedCards.has(currentIndex)}
         >
           <Animated.View style={styles.cardsContainer}>
             {sampleCars.map((item, index) => {
@@ -904,6 +854,57 @@ export default function HomeScreen() {
             })}
           </Animated.View>
         </PanGestureHandler>
+        
+        {/* Flip Button */}
+        <Pressable 
+          style={styles.flipButton}
+          onPress={() => handleCardFlip(currentIndex)}
+        >
+          <Text style={styles.flipButtonText}>
+            Flip
+          </Text>
+        </Pressable>
+
+        {/* Full Screen Image Modal */}
+        <Modal
+          visible={isFullScreenImage}
+          transparent={false}
+          animationType="fade"
+          onRequestClose={() => setIsFullScreenImage(false)}
+        >
+          <View style={styles.fullScreenContainer}>
+            <Pressable 
+              style={styles.closeButton}
+              onPress={() => setIsFullScreenImage(false)}
+            >
+              <Text style={styles.closeButtonText}>✕</Text>
+            </Pressable>
+            
+            <ScrollView 
+              horizontal 
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              contentOffset={{ x: fullScreenStartIndex * screenWidth, y: 0 }}
+            >
+              {fullScreenImages.map((imageUri, imgIndex) => (
+                <View key={imgIndex} style={styles.fullScreenImageWrapper}>
+                  <ScrollView
+                    maximumZoomScale={3}
+                    minimumZoomScale={1}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                  >
+                    <Image 
+                      source={{ uri: imageUri }} 
+                      style={styles.fullScreenImage}
+                      resizeMode="contain"
+                    />
+                  </ScrollView>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </Modal>
       </View>
     </AppScreen>
   );
@@ -927,12 +928,14 @@ const styles = StyleSheet.create({
   cardContainer: {
     position: 'absolute',
     width: screenWidth - 40,
-    height: screenHeight * 0.75,
+    height: screenHeight * 0.68,
   },
   carCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -957,46 +960,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
-  testBackContent: {
-    padding: 20,
-    backgroundColor: '#FF6B6B',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  testBackTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 10,
-  },
-  testBackSubtitle: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    marginBottom: 10,
-  },
-  testBackInfo: {
-    fontSize: 14,
-    color: '#FFFFFF',
-    marginBottom: 5,
-  },
-  scrollTestContent: {
-    padding: 20,
-    backgroundColor: '#4ECDC4',
-    marginBottom: 20,
-  },
-  scrollTestTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  scrollTestText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
   cardDetails: {
     flex: 1,
     padding: 28,
@@ -1005,7 +968,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   imageCarousel: {
-    height: 200,
+    height: 300,
     position: 'relative',
   },
   carouselScroll: {
@@ -1013,7 +976,7 @@ const styles = StyleSheet.create({
   },
   carouselImage: {
     width: screenWidth - 40,
-    height: 200,
+    height: 300,
     resizeMode: 'cover',
   },
   imageCounter: {
@@ -1030,154 +993,154 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  backHeader: {
-    padding: 20,
+  backHeaderCompact: {
+    padding: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
   },
-  backVehicleTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#1E293B',
+  backHeaderTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
+  },
+  backHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   backPrice: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 32,
+    fontWeight: '800',
     color: '#0B1D4D',
-    marginBottom: 12,
   },
-  backMileageRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  backMileage: {
-    fontSize: 18,
-    color: '#64748B',
-    fontWeight: '500',
-  },
-  dealTierBadge: {
+  dealTierBadgeCompact: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 16,
   },
-  dealTierText: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  listedTime: {
-    fontSize: 14,
-    color: '#94A3B8',
-    fontStyle: 'italic',
-  },
-  sellerSection: {
-    padding: 20,
-    backgroundColor: '#F8FAFC',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1E293B',
-    marginBottom: 12,
-  },
-  sellerInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  sellerName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1E293B',
-  },
-  sellerLocation: {
-    fontSize: 14,
-    color: '#64748B',
-  },
-  specsSection: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-  },
-  specsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  specRow: {
-    width: '48%',
-    marginBottom: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#F8FAFC',
-    borderRadius: 8,
-  },
-  specLabel: {
+  dealTierTextCompact: {
     fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  backVehicleTitleCompact: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 6,
+  },
+  quickInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  quickInfoText: {
+    fontSize: 13,
     color: '#64748B',
     fontWeight: '500',
-    marginBottom: 4,
   },
-  specValue: {
+  quickInfoDivider: {
+    fontSize: 13,
+    color: '#CBD5E1',
+    marginHorizontal: 8,
+  },
+  keyDetailsSection: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 16,
+    backgroundColor: '#F8FAFC',
+    gap: 8,
+  },
+  keyDetailItem: {
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  keyDetailLabel: {
+    fontSize: 10,
+    color: '#94A3B8',
+    fontWeight: '600',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  keyDetailValue: {
     fontSize: 14,
     color: '#1E293B',
-    fontWeight: '600',
+    fontWeight: '700',
   },
-  descriptionSection: {
-    padding: 20,
-    backgroundColor: '#F8FAFC',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-  },
-  descriptionText: {
-    fontSize: 16,
-    color: '#475569',
-    lineHeight: 24,
-  },
-  prosConsSection: {
-    padding: 20,
+  prosConsCompact: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 12,
     backgroundColor: '#FFFFFF',
   },
-  prosSection: {
-    marginBottom: 20,
+  prosColumnCompact: {
+    flex: 1,
+    backgroundColor: '#ECFDF5',
+    padding: 12,
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#059669',
   },
-  consSection: {
-    marginBottom: 0,
+  consColumnCompact: {
+    flex: 1,
+    backgroundColor: '#FEF2F2',
+    padding: 12,
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#DC2626',
   },
-  prosConsTitle: {
-    fontSize: 16,
+  prosConsTitleCompact: {
+    fontSize: 13,
     fontWeight: '700',
     color: '#1E293B',
-    marginBottom: 12,
-  },
-  prosConsItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
     marginBottom: 8,
   },
-  prosConsBullet: {
-    fontSize: 16,
-    color: '#64748B',
-    marginRight: 8,
-    marginTop: 2,
-  },
-  prosText: {
-    fontSize: 14,
+  prosTextCompact: {
+    fontSize: 12,
     color: '#059669',
-    flex: 1,
-    lineHeight: 20,
+    lineHeight: 18,
+    marginBottom: 4,
   },
-  consText: {
-    fontSize: 14,
+  consTextCompact: {
+    fontSize: 12,
     color: '#DC2626',
-    flex: 1,
-    lineHeight: 20,
+    lineHeight: 18,
+    marginBottom: 4,
+  },
+  descriptionCompact: {
+    padding: 16,
+    backgroundColor: '#F8FAFC',
+  },
+  descriptionTextCompact: {
+    fontSize: 14,
+    color: '#475569',
+    lineHeight: 22,
+  },
+  sellerCompact: {
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  sellerLabel: {
+    fontSize: 12,
+    color: '#94A3B8',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  sellerNameCompact: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1E293B',
   },
   imageContainer: {
     position: 'relative',
@@ -1200,7 +1163,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 30,
@@ -1209,27 +1171,18 @@ const styles = StyleSheet.create({
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
   },
   priceBadgeText: {
-    color: '#1E293B',
+    color: '#FFFFFF',
     fontSize: 20,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
     marginBottom: 20,
-    flexWrap: 'wrap',
-  },
-  titleLeft: {
-    flex: 1,
-    marginRight: 20,
-    flexShrink: 1,
   },
   carTitle: {
     fontSize: 22,
@@ -1237,16 +1190,6 @@ const styles = StyleSheet.create({
     color: '#0F172A',
     letterSpacing: -0.5,
     lineHeight: 26,
-    flexWrap: 'wrap',
-  },
-  priceRight: {
-    alignItems: 'flex-end',
-  },
-  priceText: {
-    fontSize: 24,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-    lineHeight: 28,
   },
   milesLocationRow: {
     marginBottom: 16,
@@ -1333,20 +1276,63 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
   },
-  debugInfo: {
+  flipButton: {
     position: 'absolute',
-    top: 60,
-    left: 20,
-    right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    padding: 10,
-    borderRadius: 8,
-    zIndex: 9999,
+    bottom: 20,
+    alignSelf: 'center',
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 25,
+    shadowColor: '#3B82F6',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    minWidth: 160,
   },
-  debugText: {
+  flipButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.5,
     textAlign: 'center',
   },
+  fullScreenContainer: {
+    flex: 1,
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '600',
+  },
+  fullScreenImageWrapper: {
+    width: screenWidth,
+    height: screenHeight,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImage: {
+    width: screenWidth,
+    height: screenHeight,
+  },
 });
+
